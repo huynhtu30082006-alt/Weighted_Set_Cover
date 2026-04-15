@@ -3,7 +3,6 @@
 #include "greedy.h"
 
 int main() {
-    // ── Nhập input ──────────────────────────
     int n_vul, n_patch, n_runs;
 
     cout << "WEIGHTED SET COVER PROBLEM\n";20
@@ -13,18 +12,15 @@ int main() {
     cout << "Nhap so lan chay     : "; cin >> n_runs;
     cout << "\n";
 
-    // Giới hạn Brute Force
     bool runBF = (n_patch <= 20);
     if (!runBF)
         cout << "[!] n_patch > 20 -> Bo qua Brute Force (qua cham)\n\n";
 
-    // ── Biến tích luỹ average ────────────────
     double bf_cost = 0, bf_time = 0, bf_patches = 0;
     double gr_cost = 0, gr_time = 0, gr_patches = 0;
 
-    mt19937 rng(42); // seed cố định → kết quả lặp lại được
+    mt19937 rng(42); 
 
-    // ── Chạy n_runs lần ─────────────────────
     for (int run = 1; run <= n_runs; run++) {
         cout << "Run " << run << "/" << n_runs;
 

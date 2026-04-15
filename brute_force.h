@@ -2,12 +2,6 @@
 #include "utils.h"
 #include <set>
 
-// ─────────────────────────────────────────
-//  BRUTE FORCE
-//  Duyệt tất cả 2^m tổ hợp patch
-//  Chỉ dùng khi n_patch <= 20
-// ─────────────────────────────────────────
-
 Result bruteForceSolve(int n_vul, vector<Patch>& patches) {
     auto start = chrono::high_resolution_clock::now();
 
@@ -15,7 +9,6 @@ Result bruteForceSolve(int n_vul, vector<Patch>& patches) {
     double bestCost = 1e18;
     int    bestMask = -1;
 
-    // mask: số nhị phân, bit i = 1 → chọn patch i
     for (int mask = 1; mask < (1 << m); mask++) {
 
         set<int> covered;
@@ -29,7 +22,6 @@ Result bruteForceSolve(int n_vul, vector<Patch>& patches) {
             }
         }
 
-        // Hợp lệ nếu cover đủ n_vul vulnerability
         bool valid = ((int)covered.size() == n_vul);
 
         if (valid && cost < bestCost) {
@@ -38,7 +30,6 @@ Result bruteForceSolve(int n_vul, vector<Patch>& patches) {
         }
     }
 
-    // Lấy solution từ bestMask
     Result res;
     res.totalCost  = (bestMask == -1) ? -1 : bestCost;
     res.numPatches = 0;

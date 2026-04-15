@@ -24,9 +24,6 @@ struct Result {
     double runtime = 0;          
 };
 
-// ─────────────────────────────────────────
-//  SINH DỮ LIỆU NGẪU NHIÊN
-// ─────────────────────────────────────────
 inline vector<Patch> generateData(int n_vul, int n_patch, mt19937& rng) {
     vector<Patch> patches(n_patch);
 
@@ -54,9 +51,6 @@ inline vector<Patch> generateData(int n_vul, int n_patch, mt19937& rng) {
     return patches;
 }
 
-// ─────────────────────────────────────────
-//  IN KẾT QUẢ
-// ─────────────────────────────────────────
 inline void printResult(const string& algoName, const Result& r) {
     cout << algoName << ":\n";
     cout << "  Solution : [";
@@ -81,4 +75,4 @@ inline void printAverage(const string& algoName,
     cout << "  Avg Time    : " << (n > 0 ? sumTime / n : 0) << "s\n\n";
 }
 
-#endif // UTILS_H
+#endif 

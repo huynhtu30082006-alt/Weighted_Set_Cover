@@ -2,16 +2,10 @@
 #include "utils.h"
 #include <set>
 
-// ─────────────────────────────────────────
-//  GREEDY (cost / coverage)
-//  Mỗi bước chọn patch có ratio nhỏ nhất:
-//  ratio = cost / số_lỗ_hổng_mới_vá_được
-// ─────────────────────────────────────────
 
 Result greedySolve(int n_vul, vector<Patch>& patches) {
     auto start = chrono::high_resolution_clock::now();
 
-    // Tập lỗ hổng chưa được vá
     set<int> uncovered;
     for (int i = 0; i < n_vul; i++)
         uncovered.insert(i);
@@ -28,7 +22,6 @@ Result greedySolve(int n_vul, vector<Patch>& patches) {
         for (int i = 0; i < (int)patches.size(); i++) {
             if (used[i]) continue;
 
-            // Đếm số lỗ hổng MỚI patch i vá được
             int newCount = 0;
             for (int v : patches[i].covers)
                 if (uncovered.count(v)) newCount++;
@@ -42,10 +35,8 @@ Result greedySolve(int n_vul, vector<Patch>& patches) {
             }
         }
 
-        // Không còn patch nào vá được → dừng
         if (bestIdx == -1) break;
 
-        // Chọn patch tốt nhất
         used[bestIdx] = true;
         res.solution.push_back(patches[bestIdx].name);
         res.totalCost  += patches[bestIdx].cost;
