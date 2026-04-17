@@ -17,7 +17,7 @@ class Problem
         //getter
         int get_n_patch() const {return n_patch;}
         int get_n_vul() const {return n_vul;}
-        vector<vector<int>> get_patch() const {return patch;}
-        vector<int> get_cost() const {return cost;}
+        const vector<vector<int>>& get_patch() const {return patch;}
+        const vector<int>& get_cost() const {return cost;}
 
 };

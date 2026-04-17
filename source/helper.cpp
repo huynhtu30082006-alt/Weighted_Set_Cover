@@ -56,7 +56,7 @@ vector<string> Helper::get_file_in_folder(const string& folder_name)
     return file;
 }
 
-bool Helper::check_exist_file(const vector<string>& file)
+bool Helper::check_exist_file_on_folder(const vector<string>& file)
 {
     return file.empty();
 

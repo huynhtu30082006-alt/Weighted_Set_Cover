@@ -21,7 +21,7 @@ class Algorithms
         static double estimate_bound(const Problem& p, vector<int>& current);
         static void DFS_ILP(const Problem& p, int i, vector<int>& current, vector<int>& best_solution, double& best_cost);
         static bool is_covered(const Problem& p, vector<int>& current);
-        static double current_cost(const Problem& p, vector<int>& current);
+        static double current_cost(const Problem& p, const vector<int>& current);
         static Solution ILP(const Problem& p);
         
 };

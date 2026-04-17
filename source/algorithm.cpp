@@ -6,30 +6,44 @@ Solution Algorithms::Brute_Force(const Problem& p)
 {
     auto start = chrono::high_resolution_clock::now();
 
+    cout << "On Brute force func\n";
+
     int m = p.get_n_patch();
+    cout << "m = " << m << endl;
+
+    if (m <= 0)
+        return {{}, 0.0, 0, 0.0};
+
+    if (m >= 60)
+    {
+        throw std::runtime_error("Brute force not feasible: The number of Patch too large");
+    }
 
     double best_cost = 1e18;
     vector<int> best_solution(m, 0);
 
-    // duyệt tất cả subset
-    for (int mask = 1; mask < (1 << m); mask++)
+    long long total = (1LL << m);
+
+    for (long long mask = 1; mask < total; mask++)
     {
         vector<int> current(m, 0);
 
-        // convert mask → vector current
+        // convert mask → vector
         for (int i = 0; i < m; i++)
         {
-            if (mask & (1 << i))
+            if (mask & (1LL << i))
             {
                 current[i] = 1;
             }
         }
 
         // check cover
+        cout << "before is_covered\n";
         if (is_covered(p, current))
         {
+            cout << "after is_covered\n";
             double cost = current_cost(p, current);
-
+            cout << "after cost\n";
             if (cost < best_cost)
             {
                 best_cost = cost;
@@ -41,12 +55,13 @@ Solution Algorithms::Brute_Force(const Problem& p)
     auto end = chrono::high_resolution_clock::now();
     double runtime = chrono::duration<double>(end - start).count();
 
-    // count patches
     int count = 0;
     for (int x : best_solution)
     {
         count += x;
     }
+
+    cout << "Done Brute force func\n";
 
     return {best_solution, best_cost, count, runtime};
 }
@@ -131,14 +146,15 @@ bool Algorithms::is_covered(const Problem& p, vector<int>& current)
     {
         if(current[i] == 1)
         {
+            cout << "V: ";
             for(int v : p.get_patch()[i]) //v return the all number in patch
             {
+                cout << v << " ";
                 covered[v] = true; 
             }
         }
     }
 
-    //check all element are true?
     for(bool x : covered)
     {
         if(x == false)
@@ -148,6 +164,16 @@ bool Algorithms::is_covered(const Problem& p, vector<int>& current)
     }
     return true;
 
+}
+
+double Algorithms::current_cost(const Problem& p, const vector<int>& current) 
+{
+    double cost = 0;
+    for (int i = 0; i < p.get_n_patch(); i++)
+    {
+        if (current[i]) cost += p.get_cost()[i];
+    }
+    return cost;
 }
 
 double Algorithms::estimate_bound(const Problem& p, vector<int>& current)

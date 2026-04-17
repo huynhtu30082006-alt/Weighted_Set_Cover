@@ -1,8 +1,8 @@
 #include "interface.h"
 #include <iostream>
-#include "problem.h"
+
 #include "stats.h"
-#include "algorithm.h"
+
 #include "helper.h"
 
 
@@ -24,10 +24,7 @@ void CLI::show_failed_interface(const string& center_message, const string& mess
     cout << "=====================================\n\n";
     cout << message << endl;
 
-    cout << "-------------------------------------\n";
-    cout << " Press any key to continue...\n";
-    cin.ignore(); 
-    cin.get();     
+    waitting_screen();
 
 }
 
@@ -36,7 +33,7 @@ void CLI::show_result_file_exist_on_folder(const vector<string>& file)
     clear();
 
     cout << "Available File:\n";
-    for(int i = 0; i < file.size(); i ++)
+    for(size_t i = 0; i < file.size(); i ++)
     {
         cout << i+1 << ". " << file[i] << endl;
     }
@@ -47,13 +44,13 @@ CLI::Plot_Graph_State CLI::plot_graph(const string& type)
     vector<string> file = Helper::get_file_in_folder("result");
     if(type != "scalability")
     {
-        if(!Helper::check_exist_file(file))
+        if(!Helper::check_exist_file_on_folder(file))
         {
             while(true)
             {
                 show_result_file_exist_on_folder(file);
                 cout << "Choose file: ";
-                int choice;
+                size_t choice;
                 cin >> choice;
 
                 if (choice < 1 || choice > file.size()) 
@@ -69,7 +66,8 @@ CLI::Plot_Graph_State CLI::plot_graph(const string& type)
         }
         else
         {
-            cout << "No file found!!!\n";
+            show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
+            
         }
     }
     else
@@ -81,7 +79,8 @@ CLI::Plot_Graph_State CLI::plot_graph(const string& type)
         }
         else
         {
-            cout << "Need at least 2 datasets to plot scalability!\n";
+            show_failed_interface("PLOT GRAPH", "Need at least 2 datasets to plot scalability!");
+
         }
 
     }
@@ -184,6 +183,10 @@ CLI::State CLI::control_plot_graph()
                 pgs = plot_graph("quality");
                 break;
             }
+            case(Plot_Graph_State::EXIT):
+            {
+                break;
+            }
             
         }
 
@@ -192,43 +195,84 @@ CLI::State CLI::control_plot_graph()
 
 }
 
-void CLI::show_patch_selected(Problem& p, Solution& s)
+void CLI::show_patch_selected(const Problem& p, const Solution& s)
 {
-    vector<vector<int>> patch = p.get_patch();
 
-    for(int i = 0; i < s.patch_selected.size(); i ++)
+    int count = 1;
+    cout << s.num_patches << endl;
+    for(size_t i = 0; i < s.patch_selected.size(); i++)
     {
-        cout << "[";
-        for(int j = 0; j < patch[i].size(); j++)
+        if(s.patch_selected[i] == 1)
         {
-           if(j == (patch[i].size() - 1))
-           {
-                cout << patch[i][j];
-           }
-           cout << patch[i][j] << ","; 
+            const auto& patches = p.get_patch();
+            cout << "[";
+            for(size_t j = 0; j < patches[i].size(); j ++)
+            {
+                cout << patches[i][j];
+                if(j + 1 < patches[i].size())
+                {
+                    cout << ",";
+                }
+            }
+            cout << "]";
+            if(count < s.num_patches)
+            {
+                cout << ", ";
+            }
+            count++;
         }
-        cout << "]\n";
-
     }
-
+    cout << endl;
 }
 
+void CLI::show_result_after_create_obj(const Problem& p)
+{
+    cout << "Number of vul: " << p.get_n_vul() << endl;
+    cout << "Number of patch: " << p.get_n_patch() << endl;
+    cout << "Patch: ";
+    cout << "Patch: ";
+    
+    cout << "Cost: ";
+    for(size_t i = 0; i < p.get_cost().size(); i++)
+    {
+        cout << p.get_cost()[i] << " ";
+
+    }
+    cout << endl;
+
+
+}
 CLI::Algorithm_Type CLI::run_algo(const string& file_name, AlgoFunc algo, const string& algo_name)
 {
+    cout << "On run algo func\n";
     Problem p(file_name);
-    Solution s = algo(p);
+    cout << "Problem func done\n";
+    try
+    {
+        Solution s = algo(p);
+        cout << "Solution func done\n";
 
-    clear();
+        clear();
 
-    cout << "=====================================\n";
-    cout << "            " << algo_name << "      \n";
-    cout << "=====================================\n\n";
-    cout << "Patches Selected: ";
-    show_patch_selected(p, s);
-    cout << "Cost: " << s.total_cost << "\n";
-    cout << "Run Time: " << s.runtime << "s\n";
+        cout << "=====================================\n";
+        cout << "            " << algo_name << " RESULT" << "      \n";
+        cout << "=====================================\n\n";
+        cout << "Patches Selected: ";
+        show_patch_selected(p, s);
+        cout << "Cost: " << s.total_cost << "\n";
+        cout << "Run Time: " << s.runtime << "s\n";
 
-    return Algorithm_Type::ALGORITHM_MENU;
+        waitting_screen();
+
+    }
+    catch(const runtime_error& e)
+    {
+        cerr << e.what() << endl;
+        waitting_screen();
+        return Algorithm_Type::EXIT;
+    }
+
+    return Algorithm_Type::EXIT;
 }
 
 void CLI::show_algo_menu()
@@ -238,7 +282,7 @@ void CLI::show_algo_menu()
     cout << "=====================================\n";
     cout << "            ALGORITHM  \n";
     cout << "=====================================\n\n";
-    cout << "What do you want to do? (Result incl\n";
+    cout << "What do you want to do?\n";
     cout << "1. Brute-Force\n";
     cout << "2. Greedy\n";
     cout << "3. Genetic Algorithm (GA)\n";
@@ -298,23 +342,23 @@ CLI::Algorithm_Type CLI::activity_algo()
 
 }
 
-string CLI::choose_file()
+string CLI::get_file()
 {
-    vector<string> file = Helper::get_file_in_folder("result"); 
+    vector<string> file = Helper::get_file_in_folder("data_set"); 
 
-    if(!Helper::check_exist_file(file))
+    if(!Helper::check_exist_file_on_folder(file))
     {
         while(true)
         {
             show_result_file_exist_on_folder(file);
             cout << "Choose file: ";
 
-            int choice;
+            size_t choice;
             cin >> choice;
 
             if (choice < 1 || choice > file.size()) 
             {
-                cout << "Invalid choice!\n";
+                show_failed_interface("ALGORITHM", "Invalid Input!!! Try Again!");
                 continue;
             }
             return file[choice - 1];
@@ -335,14 +379,10 @@ CLI::State CLI::control_run_single_algo()
         {
             case(Algorithm_Type::ALGORITHM_MENU):
             {
-                file_name = choose_file();
+                file_name = get_file();
                 if(file_name.empty())
                 {
-                    cout << "No file found! Try Again!!!";
-                    cout << "-------------------------------------\n";
-                    cout << " Press any key to continue...\n";
-                    cin.ignore();  // clear buffer
-                    cin.get();     // wait for key press
+                    show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
                     return State::MAIN_MENU;
                 }
                 at = activity_algo();
@@ -358,27 +398,32 @@ CLI::State CLI::control_run_single_algo()
                 at = run_algo(file_name, Algorithms::Greedy, "GREEDY");
                 break;
             }
-            // case(Algorithm_Type::GA):
-            // {
-            //     // at = plot_graph("scalability");
-            //     break;
-            // }
-            // case(Algorithm_Type::SA):
-            // {
-            //     // at = plot_graph("quality");
-            //     break;
-            // }
+            case(Algorithm_Type::GA):
+            {
+                // at = plot_graph("scalability");
+                at = Algorithm_Type::ALGORITHM_MENU;
+                break;
+            }
+            case(Algorithm_Type::SA):
+            {
+                // at = plot_graph("quality");
+                at = Algorithm_Type::ALGORITHM_MENU;
+                break;
+            }
             case (Algorithm_Type::ILP):
             {
                 at = run_algo(file_name, Algorithms::ILP, "ILP");
                 break;
             }
-            
+            case(Algorithm_Type::EXIT):
+            {
+                break;
+            }
         }
 
     }
+
     return State::MAIN_MENU;
-    
 
 }
 
@@ -386,15 +431,22 @@ CLI::State CLI::control_run_all_algo()
 {
     clear();
 
+    string file_name = get_file();
+    if(file_name.empty())
+    {
+        show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
+        return State::MAIN_MENU;
+    }
+    Problem p(file_name);
+
     int n;
     cout << "Enter the number of time to run: ";
     cin >> n;
-    Problem p("input.txt");
-
-    string file_name = "Result_" + to_string(p.get_n_vul()) + ".csv";
     vector<pair<string, Stats>> results;
 
     vector<pair<string, AlgoFunc>> algorithms = {
+        {"Brute_Force", Algorithms::Brute_Force},
+        {"Greedy", Algorithms::Greedy},
         {"ILP", Algorithms::ILP}
     };
 
@@ -443,7 +495,7 @@ CLI::State CLI::activity()
         cin >> choose;
         cin.ignore();
 
-        if (choose < 1 || choose > 3)
+        if (choose < 1 || choose > 4)
         {
             show_failed_interface("WEIGHTED SET COVER CLI", "Invalid Input!!! Try Again!");
             continue;
@@ -500,6 +552,10 @@ void CLI::main_control()
                 s = control_plot_graph();
                 break;
 
+            }
+            case(State::EXIT):
+            {
+                break;
             }
         }
 

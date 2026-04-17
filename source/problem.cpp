@@ -24,12 +24,14 @@ Problem::Problem(const string& file_name)
     // read patch
     patch.resize(n_patch);
 
-    for (int i = 0; i < n_patch; i++) {
+    for (int i = 0; i < n_patch; i++) 
+    {
         int k;
         fin >> k;
 
         patch[i].resize(k);
-        for (int j = 0; j < k; j++) {
+        for (int j = 0; j < k; j++) 
+        {
             fin >> patch[i][j];
         }
     }
