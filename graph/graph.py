@@ -15,29 +15,36 @@ class Plotter:
     #Graph 1: Cost Comparison
     def plot_cost(self):
         plt.figure()
-        plt.bar(self.df["Algorithm"], self.df["AvgCost"])
+
+        scaled = self.df["AvgCost"] * 1e6
+
+        plt.bar(self.df["Algorithm"], scaled)
         plt.title("Cost Comparison")
         plt.xlabel("Algorithm")
-        plt.ylabel("Average Cost")
+        plt.ylabel("Average Cost (×1e-6)")
         plt.show()
 
     #Graph 2: Runtime Comparison
     def plot_runtime(self):
         plt.figure()
-        plt.bar(self.df["Algorithm"], self.df["AvgTime"])
-        plt.title("Run Time Comparision")
-        plt.xlabel("Algorithm")
-        plt.ylabel("Average Run Time")
-        plt.show()
 
+        scaled = self.df["AvgTime"] * 1e6  # microseconds
+
+        plt.bar(self.df["Algorithm"], scaled)
+
+        plt.yscale("log")  # 🔥 KEY FIX
+
+        plt.title("Run Time Comparison (log scale)")
+        plt.xlabel("Algorithm")
+        plt.ylabel("Average Run Time (µs, log scale)")
+        plt.show()
+        
     #Graph 3: Scability Comparision
-    def plot_scability(self):
+    def plot_scalability(self):
         plt.figure()
 
         for algo in self.df["Algorithm"].unique():
             subset = self.df[self.df["Algorithm"] == algo]
-
-            # sort để line không bị zigzag
             subset = subset.sort_values(by="N_Vul")
 
             plt.plot(
@@ -47,16 +54,17 @@ class Plotter:
                 label=algo
             )
 
-        plt.title("Scalability")
+        plt.yscale("log")   # quan trọng
+        plt.title("Scalability (log scale)")
         plt.xlabel("Number of Vulnerabilities")
-        plt.ylabel("Runtime")
+        plt.ylabel("Runtime (log)")
         plt.legend()
         plt.grid(True)
         plt.show()
 
     #Graph 4: Quality Optimal Comparison
     def plot_quality_optimal(self):
-        optimal = self.df[self.df["Algorithm"] == "ILP"]["AvgCost"].values[0]
+        optimal = self.df[self.df["Algorithm"] == "ILP"]["AvgCost"].min()
         self.df["Ratio"] = self.df["AvgCost"] / optimal
 
         plt.figure()

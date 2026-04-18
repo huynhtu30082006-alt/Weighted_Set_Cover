@@ -1,0 +1,4 @@
+Algorithm,N_Vul,AvgCost,AvgTime,AvgPatch
+Brute_Force,20,30,0.00479898,4
+Greedy,20,41,2.74e-06,7
+ILP,20,30,0.00010054,4

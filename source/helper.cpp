@@ -48,6 +48,7 @@ void Helper::write_result(vector<pair<string, Stats>>& v, int n_vul, const strin
         write << name << "," << n_vul << "," << s.avg_cost << "," << s.avg_time << "," << s.avg_patch << endl;
     }
     write.close();
+
     cout << "Your results have been successfully saved on: '" << f << "'"<< "\n";
 }
 
