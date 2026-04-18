@@ -86,7 +86,7 @@ if __name__ == "__main__":
         actions = {
             "cost": plotter.plot_cost,
             "runtime": plotter.plot_runtime,
-            "quality": plotter.plot_quality
+            "quality": plotter.plot_quality_optimal
         }
 
         if mode in actions:

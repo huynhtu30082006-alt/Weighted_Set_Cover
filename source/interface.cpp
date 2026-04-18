@@ -55,10 +55,11 @@ CLI::Plot_Graph_State CLI::plot_graph(const string& type)
 
                 if (choice < 1 || choice > file.size()) 
                 {
-                    cout << "Invalid choice!\n";
+                    show_failed_interface("PLOT GRAPH", "Invalid Input!!! Try Again!");
                     continue;
                 }
-                string cmd = "python graph/graph.py " + type + " result/" + file[choice - 1];
+                string cmd = "python graph/graph.py " + type + " " + file[choice - 1];
+                cout << cmd << endl;
                 system(cmd.c_str());
                 break;
             }
@@ -84,6 +85,7 @@ CLI::Plot_Graph_State CLI::plot_graph(const string& type)
         }
 
     }
+    waitting_screen();
     return Plot_Graph_State::GRAPH_MENU;
 
 }
@@ -342,9 +344,9 @@ CLI::Algorithm_Type CLI::activity_algo()
 
 }
 
-string CLI::get_file()
+string CLI::get_file(const string& folder_name)
 {
-    vector<string> file = Helper::get_file_in_folder("data_set"); 
+    vector<string> file = Helper::get_file_in_folder(folder_name); 
 
     if(!Helper::check_exist_file_on_folder(file))
     {
@@ -379,7 +381,7 @@ CLI::State CLI::control_run_single_algo()
         {
             case(Algorithm_Type::ALGORITHM_MENU):
             {
-                file_name = get_file();
+                file_name = get_file("data_set");
                 if(file_name.empty())
                 {
                     show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
@@ -431,7 +433,7 @@ CLI::State CLI::control_run_all_algo()
 {
     clear();
 
-    string file_name = get_file();
+    string file_name = get_file("data_set");
     if(file_name.empty())
     {
         show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
@@ -450,6 +452,7 @@ CLI::State CLI::control_run_all_algo()
         {"ILP", Algorithms::ILP}
     };
 
+    clear();
     for(auto& [name, algo] : algorithms)
     {
         Stats s = Helper::run_benchmark(p, algo, n);

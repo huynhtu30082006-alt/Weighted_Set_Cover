@@ -45,7 +45,7 @@ class CLI
         State control_plot_graph();
 
         //run single algo
-        string get_file();
+        string get_file(const string& folder_name);
         void show_patch_selected(const Problem& p, const Solution& s);
         Algorithm_Type run_algo(const string& file_name, AlgoFunc algo, const string& algo_name);
         void show_algo_menu();
