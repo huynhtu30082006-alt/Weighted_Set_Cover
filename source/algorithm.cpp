@@ -453,7 +453,7 @@ Solution Algorithms::Greedy(const Problem& p)
             if(current[i]) continue;
 
             uint64_t new_bits = mask[i] & (~cover);
-            int gain = __builtin_popcountll(new_bits);
+            int gain = __popcnt64(new_bits);
 
             if(gain == 0) continue;
 
