@@ -1,0 +1,101 @@
+vul: 34
+patch: 20
+
+- System Graph / Goal System
+A1: Employee Laptop
+A2: Web Server
+A3: Application Server
+A4: Database Server
+A5: Internal API
+A6: Network Router
+
+- Dataset: Asset <-> Vulnerability Mapping 
+
+1. A1 — Employee Laptop (Endpoint Layer)
+CVE-2026-3910   (Chrome V8 RCE) 0
+CVE-2026-5281   (Chrome WebGPU RCE) 1
+CVE-2026-34621  (Adobe Acrobat RCE) 2
+CVE-2026-2796   (JS JIT miscompile) 3
+CVE-2026-33825  (Defender LPE) 4
+CVE-2026-3000   (Windows Logon RCE) 5
+CVE-2026-21509  (Office bypass) 6
+
+2. A2 — Web Server
+CVE-2026-22610  (Angular XSS) 7
+CVE-2026-32873 (Web Server DoS)8
+CVE-2026-39381  (Parse auth bypass) 9
+CVE-2026-35337  (Apache Storm RCE) 10
+CVE-2026-41012  (Hardcoded Credentials) 11
+
+3. A3 — Application Server
+CVE-2026-27293  (Heap overflow) 12
+CVE-2026-27292  (Use-after-free) 13
+CVE-2026-27295  (OOB write) 14
+CVE-2026-27296  (Integer underflow) 15
+CVE-2026-4415   (Gigabyte arbitrary write) 16
+
+4. A4 — Database Server
+CVE-2026-32588  (Cassandra DoS) 17
+CVE-2026-20002  (Cisco SQLi) 18
+CVE-2026-27131  (Info leak) 19
+
+5. A5 — Internal API
+CVE-2026-30834  (SSRF) 20
+CVE-2026-39921  (SSRF) 21
+CVE-2026-39922  (SSRF) 22
+CVE-2026-23546  (Plugin data leak) 23
+CVE-2026-41877 (Misconfigured S3) 24
+CVE-2026-42530 (Weak JWT Validation) 25
+
+6. A6 — Network Router (Perimeter)
+CVE-2026-2926   (D-Link overflow) 26
+CVE-2026-3769   (Tenda RCE) 27
+CVE-2026-20010  (Cisco LLDP DoS) 28
+CVE-2026-39863  (Kamailio TCP flaw) 29
+
+
+- Patch Group
+
+1. P1 — Chrome Core Update: 3910, 2796
+2. P2 — Chrome Rendering + GPU: 5281, 2796
+3. P3 — Secure Browser Rollup: 3910, 5281, 2796
+4. P4 — User Application Security Pack: 34621, 21509
+5. P5 — Windows Security Patch: 33825, 3000
+6. P6 — Endpoint Hardening Pack: 33825, 21509, 20002
+7. P7 — Web Input Validation Fix: 22610, 27131
+8. P8 — Authentication Fix Pack: 39381, 41012
+9. P9 — Web Security Bundle: 22610, 39381, 41012
+10. P10 — SSRF Core Fix: 30834, 39921, 32588
+11. P11 — Extended SSRF + Data Leak: 39921, 39922, 23546
+12. P12 — API Auth + SSRF Fix: 30834, 42530, 41877
+13. P13 — Full API Hardening: 30834, 39921, 39922, 42530
+14. P14 — Memory Safety Patch: 27293, 27292
+15. P15 — Extended Memory Fix: 27295, 27292, 27131
+16. P16 — App Core Security: 35337, 27293, 27292
+17. P17 — Full App Server Update: 35337, 27293, 27292, 27295, 27296, 4415
+18. P18 — Router RCE Fix: 2926, 3769
+19. P19 — Network Stability Patch: 20010, 39863
+20. P20 — Full Network Firmware: 2926, 3769, 20010, 39863
+
+- Cost of each Group
+1. P1: 6
+2. P2: 6
+3. P3: 6
+4. P4: 18
+5. P5: 25
+6. P6: 25
+7. P7: 18
+8. P8: 18
+9. P9: 20
+10. P10: 17
+11. P11: 19
+12. P12: 17
+13. P13: 20
+14. P14: 18
+15. P15: 18
+16. P16: 26
+17. P17: 32
+18. P18: 36
+19. P19: 36
+20. P20: 42
+

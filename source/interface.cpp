@@ -402,19 +402,17 @@ CLI::State CLI::control_run_single_algo()
             }
             case(Algorithm_Type::GA):
             {
-                // at = plot_graph("scalability");
-                at = Algorithm_Type::ALGORITHM_MENU;
+                at = run_algo(file_name, Algorithms::GA, "GENETIC ALGORITHM");
                 break;
             }
             case(Algorithm_Type::SA):
             {
-                // at = plot_graph("quality");
-                at = Algorithm_Type::ALGORITHM_MENU;
+                at = run_algo(file_name, Algorithms::SA, "SIMULATED ANNEALING");
                 break;
             }
             case (Algorithm_Type::ILP):
             {
-                at = run_algo(file_name, Algorithms::ILP, "ILP");
+                at = run_algo(file_name, Algorithms::ILP, "INTEGER LINEAR PROGRAMMING");
                 break;
             }
             case(Algorithm_Type::EXIT):
@@ -449,6 +447,8 @@ CLI::State CLI::control_run_all_algo()
     vector<pair<string, AlgoFunc>> algorithms = {
         {"Brute_Force", Algorithms::Brute_Force},
         {"Greedy", Algorithms::Greedy},
+        {"GA", Algorithms::GA},
+        {"SA", Algorithms::SA},
         {"ILP", Algorithms::ILP}
     };
 

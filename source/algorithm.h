@@ -18,12 +18,14 @@ class Algorithms
         //Greedy Algorithm
         static Solution Greedy(const Problem& p);
 
-        //ILP Algorithm
-        // static double estimate_bound(const Problem& p, vector<int>& current);
-        // static void DFS_ILP(const Problem& p, int i, vector<int>& current, vector<int>& best_solution, double& best_cost);
-        // static bool is_covered(const Problem& p, const vector<int>& current);
-        // static double current_cost(const Problem& p, const vector<int>& current);
-        // static Solution ILP(const Problem& p);
+        //GA
+        static Solution GA(const Problem& p);
+
+        //SA
+        static Solution SA(const Problem& p);
+        
+        //ILP
         static void DFS_ILP(size_t i, uint64_t cover, double cost, const vector<uint64_t>& mask, const vector<int>& costs, uint64_t FULL, vector<int>& current, vector<int>& best_solution, double& best_cost);
         static Solution ILP(const Problem& p);
+
 };
