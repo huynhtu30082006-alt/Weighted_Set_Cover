@@ -1,5 +1,6 @@
 #include "problem.h"
 #include <fstream>
+#include <sstream>
 
 Problem::Problem(const string& file_name)
 {
@@ -11,31 +12,44 @@ Problem::Problem(const string& file_name)
         exit(1);
     }
 
-    // read n_vul, n_patch
     fin >> n_vul >> n_patch;
 
-    // read cost
     cost.resize(n_patch);
     for (int i = 0; i < n_patch; i++) 
     {
         fin >> cost[i];
     }
 
-    // read patch
-    patch.resize(n_patch);
+    fin.ignore();
 
-    for (int i = 0; i < n_patch; i++) 
+    patch.clear();
+    patch_name.clear();
+
+    string line;
+    while(getline(fin, line))
     {
+        if(line.empty()) continue;
+
+        int pos = line.find('|');
+
+        string name = line.substr(0, pos);
+        string rest = line.substr(pos + 1);
+
+        stringstream ss(rest);
+
         int k;
-        fin >> k;
+        ss >> k;
 
-        patch[i].resize(k);
-        for (int j = 0; j < k; j++) 
+        vector<int> covers;
+        for(int i = 0; i < k; i++)
         {
-            fin >> patch[i][j];
+            int x;
+            ss >> x;
+            covers.push_back(x);
         }
+
+        patch.push_back(covers);
+        patch_name.push_back(name);
     }
-
     fin.close();
-
 }

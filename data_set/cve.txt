@@ -1,4 +1,4 @@
-vul: 34
+vul: 30
 patch: 20
 
 - System Graph / Goal System
@@ -56,46 +56,62 @@ CVE-2026-39863  (Kamailio TCP flaw) 29
 
 - Patch Group
 
-1. P1 — Chrome Core Update: 3910, 2796
-2. P2 — Chrome Rendering + GPU: 5281, 2796
-3. P3 — Secure Browser Rollup: 3910, 5281, 2796
-4. P4 — User Application Security Pack: 34621, 21509
-5. P5 — Windows Security Patch: 33825, 3000
-6. P6 — Endpoint Hardening Pack: 33825, 21509, 20002
-7. P7 — Web Input Validation Fix: 22610, 27131
-8. P8 — Authentication Fix Pack: 39381, 41012
-9. P9 — Web Security Bundle: 22610, 39381, 41012
-10. P10 — SSRF Core Fix: 30834, 39921, 32588
-11. P11 — Extended SSRF + Data Leak: 39921, 39922, 23546
-12. P12 — API Auth + SSRF Fix: 30834, 42530, 41877
-13. P13 — Full API Hardening: 30834, 39921, 39922, 42530
-14. P14 — Memory Safety Patch: 27293, 27292
-15. P15 — Extended Memory Fix: 27295, 27292, 27131
-16. P16 — App Core Security: 35337, 27293, 27292
-17. P17 — Full App Server Update: 35337, 27293, 27292, 27295, 27296, 4415
-18. P18 — Router RCE Fix: 2926, 3769
-19. P19 — Network Stability Patch: 20010, 39863
-20. P20 — Full Network Firmware: 2926, 3769, 20010, 39863
+#1. Browser / JS
+1. P1 — Browser Security Rollup: 3910, 5281, 34621
+2. P2 — JS Engine Stabilization Pack: 34621, 2796, 33825
+
+#2. OS patch
+3. P3 — Windows Privilege Escalation Fix Bundle: 33825, 3000, 21509
+
+#3. Config/Web
+4. P4 — Frontend Input Sanitization Patch: 22610, 32873, 39381
+5. P5 Web Auth & Credential Hardening Pack: 39381, 35337, 41012
+
+#4. App patch
+6. P6 - Memory Safety Patch (App Server - Core): 27293, 27292, 27295
+7. P7 - Memory Integrity Extension Patch: 27295, 27296, 4415 
+
+#5. DB (App-level)
+8. P8 - Database Availability Patch: 32588, 20002
+9. P9 - Database Data Protection Patch: 20002, 27131
+
+#6. API (App-level)
+10. P10 - API SSRF Protection Pack: 30834, 39921, 39922
+11. P11 - API Data Leak Prevention Patch: 39922, 23546, 41877
+12. P12 - API Authentication Hardening Patch: 41877, 42530
+
+#7. Router firmware
+13. P13 - Network Firmware Security Patch: 2926, 3769
+14. P14 - Network Protocol Stability Patch: 3769, 20010, 39863
+
+#8. Mixed (App-level + coordination)
+15. P15 - Cross-Layer Injection Defense Pack: 2796, 32873, 27292, 20002
+16. P16 - Multi-Service RCE Mitigation Patch: 21509, 41012, 4415, 39921
+17. P17 - Infrastructure Security Consolidation Patch: 5281, 22610, 27293, 30834, 2926
+
+#9. Large-scale (infra level)
+18. P18 - Endpoint Security Mega Rollup: 3910, 5281, 34621, 2796, 33825, 3000, 21509, 22610, 32873, 39381
+19. P19 - Core Infrastructure Hardening Bundle: 35337, 41012, 27293, 27292, 27295, 27296, 4415, 32588, 20002, 27131
+20. P20 - Full System Security Upgrade Pack: 30834, 39921, 39922, 23546, 41877, 42530, 2926, 3769, 20010, 39863
 
 - Cost of each Group
 1. P1: 6
-2. P2: 6
-3. P3: 6
-4. P4: 18
-5. P5: 25
-6. P6: 25
-7. P7: 18
+2. P2: 12
+3. P3: 27
+4. P4: 13
+5. P5: 19
+6. P6: 20
+7. P7: 26
 8. P8: 18
-9. P9: 20
-10. P10: 17
-11. P11: 19
-12. P12: 17
-13. P13: 20
-14. P14: 18
-15. P15: 18
-16. P16: 26
-17. P17: 32
-18. P18: 36
-19. P19: 36
-20. P20: 42
-
+9. P9: 18 
+10. P10: 20
+11. P11: 20
+12. P12: 18
+13. P13: 30
+14. P14: 33
+15. P15: 28
+16. P16: 28
+17. P17: 37
+18. P18: 52
+19. P19: 52
+20. P20: 52

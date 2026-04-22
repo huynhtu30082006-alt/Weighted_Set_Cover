@@ -207,7 +207,7 @@ void CLI::show_patch_selected(const Problem& p, const Solution& s)
         if(s.patch_selected[i] == 1)
         {
             const auto& patches = p.get_patch();
-            cout << "[";
+            cout << p.get_patch_name()[i] << "[";
             for(size_t j = 0; j < patches[i].size(); j ++)
             {
                 cout << patches[i][j];
