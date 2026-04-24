@@ -10,15 +10,15 @@ Stats Helper::run_benchmark(const Problem& p, AlgoFunc algo, int runs)
     for(int i = 0; i < runs; i++)
     {
         Solution s = algo(p);
-
         total_cost += s.total_cost;
         total_time += s.runtime;
         total_patch += s.num_patches;
+        
     }
 
     return {total_cost / runs,
             total_time / runs,
-            (double) total_patch / runs};
+            (double) (total_patch / runs)};
 }
 
 filesystem::path Helper::change_folder_of_file(const string& new_folder_path, const string& current_path_file_name)

@@ -10,6 +10,14 @@ class Plotter:
     
     def load_data(self):
         self.df = pd.read_csv(self.file_path)
+
+        # ép kiểu để tránh sort sai
+        self.df["N_Vul"] = self.df["N_Vul"].astype(int)
+        self.df["AvgTime"] = self.df["AvgTime"].astype(float)
+
+        # check nhanh
+        print("Loaded data:")
+        print(self.df.groupby("Algorithm")["N_Vul"].unique())
     
 
     #Graph 1: Cost Comparison
@@ -43,23 +51,39 @@ class Plotter:
     def plot_scalability(self):
         plt.figure()
 
-        for algo in self.df["Algorithm"].unique():
-            subset = self.df[self.df["Algorithm"] == algo]
+        # đảm bảo dữ liệu sạch
+        df = self.df.copy()
+        df["N_Vul"] = df["N_Vul"].astype(int)
+        df["AvgTime"] = df["AvgTime"].astype(float)
+
+        for algo in sorted(df["Algorithm"].unique()):
+            subset = df[df["Algorithm"] == algo].copy()
+
+            # remove duplicate nếu có
+            subset = subset.drop_duplicates(subset=["N_Vul"])
+
+            # sort chuẩn numeric
             subset = subset.sort_values(by="N_Vul")
+
+            # DEBUG cực quan trọng
+            print(f"{algo}: {subset['N_Vul'].tolist()}")
 
             plt.plot(
                 subset["N_Vul"],
                 subset["AvgTime"],
                 marker='o',
+                linewidth=2,
                 label=algo
             )
 
-        plt.yscale("log")   # quan trọng
+        plt.yscale("log")
         plt.title("Scalability (log scale)")
         plt.xlabel("Number of Vulnerabilities")
-        plt.ylabel("Runtime (log)")
+        plt.ylabel("Runtime (seconds, log scale)")
         plt.legend()
-        plt.grid(True)
+        plt.grid(True, which="both", linestyle="--", alpha=0.5)
+
+        plt.tight_layout()
         plt.show()
 
     #Graph 4: Quality Optimal Comparison
@@ -108,10 +132,18 @@ if __name__ == "__main__":
 
         all_data = []
 
-        for file in os.listdir(folder):
+        for file in sorted(os.listdir(folder)):  # sort để đảm bảo order
             if file.endswith(".csv"):
                 path = os.path.join(folder, file)
                 df = pd.read_csv(path)
+
+                print(f"\nFILE: {file}")
+                print(df)
+
+                # ép kiểu ngay từ đầu
+                df["N_Vul"] = df["N_Vul"].astype(int)
+                df["AvgTime"] = df["AvgTime"].astype(float)
+
                 all_data.append(df)
 
         if not all_data:
@@ -120,7 +152,11 @@ if __name__ == "__main__":
 
         df = pd.concat(all_data, ignore_index=True)
 
+        # DEBUG tổng thể
+        print("\n=== FINAL DATA CHECK ===")
+        print(df.groupby("Algorithm")["N_Vul"].unique())
+
         plotter = Plotter(None)
-        plotter.df = df   # inject data trực tiếp
+        plotter.df = df
 
         plotter.plot_scalability()

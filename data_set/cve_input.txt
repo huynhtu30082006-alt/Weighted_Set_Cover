@@ -1,0 +1,22 @@
+30 20
+6 12 27 13 19 20 26 18 18 20 20 18 30 33 28 28 37 52 52 52
+Browser Security Rollup|3 0 1 2
+JS Engine Stabilization Pack|3 2 3 4
+Windows Privilege Escalation Fix Bundle|3 4 5 6
+Frontend Input Sanitization Patch|3 7 8 9
+Web Auth & Credential Hardening Pack|3 9 10 11
+Memory Safety Patch (App Server - Core)|3 12 13 14 
+Memory Integrity Extension Patch|3 14 15 16
+Database Availability Patch|2 17 18
+Database Data Protection Patch|2 18 19
+API SSRF Protection Pack|3 20 21 22
+API Data Leak Prevention Patch|3 22 23 24 
+API Authentication Hardening Patch|2 24 25 
+Network Firmware Security Patch|2 26 27
+Network Protocol Stability Patch|3 27 28 29
+Cross-Layer Injection Defense Pack|4 3 8 13 18
+Multi-Service RCE Mitigation Patch|4 6 11 16 21
+Infrastructure Security Consolidation Patch|5 1 7 12 20 26
+Endpoint Security Mega Rollup|10 0 1 2 3 4 5 6 7 8 9
+Core Infrastructure Hardening Bundle|10 10 11 12 13 14 15 16 17 18 19
+Full System Security Upgrade Pack|10 20 21 22 23 24 25 26 27 28 29

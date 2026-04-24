@@ -20,7 +20,7 @@ void CLI::show_failed_interface(const string& center_message, const string& mess
     clear();
 
     cout << "=====================================\n";
-    cout << "           "  << center_message << "   \n";
+    cout << "      " << center_message << "   \n";
     cout << "=====================================\n\n";
     cout << message << endl;
 
@@ -41,46 +41,32 @@ void CLI::show_result_file_exist_on_folder(const vector<string>& file)
 
 CLI::Plot_Graph_State CLI::plot_graph(const string& type)
 {
-    vector<string> file = Helper::get_file_in_folder("result");
     if(type != "scalability")
     {
-        if(!Helper::check_exist_file_on_folder(file))
+        string file = get_file("PLOT GRAPH", "result");
+        if(file.empty())
         {
-            while(true)
-            {
-                show_result_file_exist_on_folder(file);
-                cout << "Choose file: ";
-                size_t choice;
-                cin >> choice;
-
-                if (choice < 1 || choice > file.size()) 
-                {
-                    show_failed_interface("PLOT GRAPH", "Invalid Input!!! Try Again!");
-                    continue;
-                }
-                string cmd = "python graph/graph.py " + type + " " + file[choice - 1];
-                cout << cmd << endl;
-                system(cmd.c_str());
-                break;
-            }
-
+            show_failed_interface("PLOT GRAPH", "No file found! Try Again!!!");
         }
         else
         {
-            show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
-            
+            string cmd = "python graph/graph.py " + type + " " + file;
+            cout << cmd << endl;
+            system(cmd.c_str());
         }
+        
     }
     else
     {
+        vector<string> file = Helper::get_file_in_folder("scalability");
         if(file.size() >= 3)
         {
-            system("python graph/graph.py scalability result/");
+            system("python graph/graph.py scalability scalability/");
 
         }
         else
         {
-            show_failed_interface("PLOT GRAPH", "Need at least 2 datasets to plot scalability!");
+            show_failed_interface("PLOT GRAPH", "Need at least 3 datasets as same problem to plot scalability!");
 
         }
 
@@ -227,52 +213,25 @@ void CLI::show_patch_selected(const Problem& p, const Solution& s)
     cout << endl;
 }
 
-void CLI::show_result_after_create_obj(const Problem& p)
-{
-    cout << "Number of vul: " << p.get_n_vul() << endl;
-    cout << "Number of patch: " << p.get_n_patch() << endl;
-    cout << "Patch: ";
-    cout << "Patch: ";
-    
-    cout << "Cost: ";
-    for(size_t i = 0; i < p.get_cost().size(); i++)
-    {
-        cout << p.get_cost()[i] << " ";
 
-    }
-    cout << endl;
-
-
-}
 CLI::Algorithm_Type CLI::run_algo(const string& file_name, AlgoFunc algo, const string& algo_name)
 {
-    cout << "On run algo func\n";
     Problem p(file_name);
-    cout << "Problem func done\n";
-    try
-    {
-        Solution s = algo(p);
-        cout << "Solution func done\n";
+    Solution s = algo(p);
+    cout << "Solution func done\n";
 
-        clear();
+    clear();
 
-        cout << "=====================================\n";
-        cout << "            " << algo_name << " RESULT" << "      \n";
-        cout << "=====================================\n\n";
-        cout << "Patches Selected: ";
-        show_patch_selected(p, s);
-        cout << "Cost: " << s.total_cost << "\n";
-        cout << "Run Time: " << s.runtime << "s\n";
+    cout << "=====================================\n";
+    cout << "      " << algo_name << " RESULT" << "      \n";
+    cout << "=====================================\n\n";
+    cout << "Patches Selected: ";
+    show_patch_selected(p, s);
+    cout << "Cost: " << s.total_cost << "\n";
+    cout << "Run Time: " << s.runtime << "s\n";
 
-        waitting_screen();
+    waitting_screen();
 
-    }
-    catch(const runtime_error& e)
-    {
-        cerr << e.what() << endl;
-        waitting_screen();
-        return Algorithm_Type::EXIT;
-    }
 
     return Algorithm_Type::EXIT;
 }
@@ -344,7 +303,7 @@ CLI::Algorithm_Type CLI::activity_algo()
 
 }
 
-string CLI::get_file(const string& folder_name)
+string CLI::get_file(const string& layer_name, const string& folder_name)
 {
     vector<string> file = Helper::get_file_in_folder(folder_name); 
 
@@ -360,7 +319,7 @@ string CLI::get_file(const string& folder_name)
 
             if (choice < 1 || choice > file.size()) 
             {
-                show_failed_interface("ALGORITHM", "Invalid Input!!! Try Again!");
+                show_failed_interface(layer_name, "Invalid Input!!! Try Again!");
                 continue;
             }
             return file[choice - 1];
@@ -381,7 +340,7 @@ CLI::State CLI::control_run_single_algo()
         {
             case(Algorithm_Type::ALGORITHM_MENU):
             {
-                file_name = get_file("data_set");
+                file_name = get_file("ALGORITHM", "data_set");
                 if(file_name.empty())
                 {
                     show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
@@ -431,7 +390,7 @@ CLI::State CLI::control_run_all_algo()
 {
     clear();
 
-    string file_name = get_file("data_set");
+    string file_name = get_file("ALGORITHM", "data_set");
     if(file_name.empty())
     {
         show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
@@ -455,13 +414,23 @@ CLI::State CLI::control_run_all_algo()
     clear();
     for(auto& [name, algo] : algorithms)
     {
-        Stats s = Helper::run_benchmark(p, algo, n);
-
-        cout << "=== " << name << " ===\n";
-        cout << "Avg Cost: " << s.avg_cost << "\n";
-        cout << "Avg Time: " << s.avg_time << "\n";
-        cout << "Avg Patch: " << s.avg_patch << "\n\n";
-
+        Stats s;
+        if(name == "Brute_Force" || name == "Greedy" || name == "ILP")
+        {
+            s = Helper::run_benchmark(p, algo, 1);
+            cout << "=== " << name << " ===\n";
+            cout << "Cost: " << s.avg_cost << "\n";
+            cout << "Run Time: " << s.avg_time << "\n";
+            cout << "Patch Selected: " << s.avg_patch << "\n\n";
+        }
+        else
+        {
+            s = Helper::run_benchmark(p, algo, n);
+            cout << "=== " << name << " ===\n";
+            cout << "Average Cost: " << s.avg_cost << "\n";
+            cout << "Average Time: " << s.avg_time << "\n";
+            cout << "Average Patch Selected: " << s.avg_patch << "\n\n";
+        }
         results.push_back({name, s});
 
     }

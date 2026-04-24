@@ -1,48 +1,13 @@
 #include "algorithm.h"
-#include <chrono>
 #include <random>
 #include <algorithm>
 #include <numeric>
 
 
-// bool Algorithms::is_covered(const Problem& p, const vector<int>& current)
-// {
-//     vector<bool> covered(p.get_n_vul(), false);
-//     const auto& patches = p.get_patch();
-
-//     for(int i = 0; i < p.get_n_patch(); i++)
-//     {
-//         if(current[i] == 1)
-//         {
-//             for(int v : patches[i])
-//             {
-//                 if(v >= 0 && v < covered.size())
-//                     covered[v] = true;
-//             }
-//         }
-//     }
-
-//     for(bool x : covered)
-//     {
-//         if(!x) return false;
-//     }
-
-//     return true;
-// }
-
-// double Algorithms::current_cost(const Problem& p, const vector<int>& current) 
-// {
-//     double cost = 0;
-//     for (int i = 0; i < p.get_n_patch(); i++)
-//     {
-//         if (current[i]) cost += p.get_cost()[i];
-//     }
-//     return cost;
-// }
-
 Solution Algorithms::Brute_Force(const Problem& p)
 {
-    auto start = chrono::high_resolution_clock::now();
+    using clk = chrono::high_resolution_clock;
+    auto start = clk::now();
 
     int m = p.get_n_patch();
     if (m <= 0) return {{}, 0.0, 0, 0.0};
@@ -56,13 +21,14 @@ Solution Algorithms::Brute_Force(const Problem& p)
         for(int v : patches[i])
             mask[i] |= (1ULL << v);
 
-    // int FULL = (1 << n) - 1;
     uint64_t FULL = (1ULL << n) - 1;
 
     double best_cost = 1e18;
     vector<int> best_solution(m, 0);
 
-    for(long long s = 1; s < (1LL << m); s++)
+    long long LIMIT = (1LL << m);
+
+    for(long long s = 1; s < LIMIT; s++)
     {
         uint64_t cover = 0;
         double cost = 0;
@@ -80,16 +46,22 @@ Solution Algorithms::Brute_Force(const Problem& p)
         {
             best_cost = cost;
             for(int i = 0; i < m; i++)
+            {
                 best_solution[i] = (s >> i) & 1;
+            }
         }
     }
 
-    auto end = chrono::high_resolution_clock::now();
+    auto end = clk::now();
 
     int count = accumulate(best_solution.begin(), best_solution.end(), 0);
 
-    return {best_solution, best_cost, count,
-            chrono::duration<double>(end-start).count()};
+    return {
+        best_solution,
+        best_cost,
+        count,
+        chrono::duration<double>(end-start).count(),
+    };
 }
 
 Solution Algorithms::Greedy(const Problem& p)
@@ -447,12 +419,13 @@ Solution Algorithms::SA(const Problem& p)
     };
 }
 
-void Algorithms::DFS_ILP(size_t i, uint64_t cover, double cost, const vector<uint64_t>& mask, const vector<int>& costs, uint64_t FULL, vector<int>& current, vector<int>& best_solution, double& best_cost)
+void Algorithms::DFS_ILP(size_t i, uint64_t cover, double cost, const vector<uint64_t>& mask, const vector<int>& costs, uint64_t FULL, vector<int>& current, vector<int>& best_solution, double& best_cost, chrono::high_resolution_clock::time_point start)
 {
-    // prune sớm
+
+    // prune
     if(cost >= best_cost) return;
 
-    // đã cover đủ
+    // đủ cover
     if(cover == FULL)
     {
         best_cost = cost;
@@ -460,19 +433,19 @@ void Algorithms::DFS_ILP(size_t i, uint64_t cover, double cost, const vector<uin
         return;
     }
 
-    // hết patch
-    if(i == mask.size())
-    {
-        return;
-    } 
+    if(i == mask.size()) return;
 
-    // chọn patch i
+    // chọn patch
     current[i] = 1;
-    DFS_ILP(i+1, cover | mask[i], cost + costs[i], mask, costs, FULL, current, best_solution, best_cost);
+    DFS_ILP(i+1, cover | mask[i], cost + costs[i],
+            mask, costs, FULL, current, best_solution, best_cost,
+            start);
 
     // không chọn
     current[i] = 0;
-    DFS_ILP(i+1, cover, cost, mask, costs, FULL, current, best_solution, best_cost);
+    DFS_ILP(i+1, cover, cost,
+            mask, costs, FULL, current, best_solution, best_cost,
+            start);
 }
 
 Solution Algorithms::ILP(const Problem& p)
@@ -485,13 +458,10 @@ Solution Algorithms::ILP(const Problem& p)
     const auto& patches = p.get_patch();
     const auto& costs = p.get_cost();
 
-    // precompute mask
     vector<uint64_t> mask(m, 0);
     for(int i = 0; i < m; i++)
-    {
         for(int v : patches[i])
             mask[i] |= (1ULL << v);
-    }
 
     uint64_t FULL = (1ULL << n) - 1;
 
@@ -499,17 +469,17 @@ Solution Algorithms::ILP(const Problem& p)
     vector<int> best_solution(m, 0);
     double best_cost = 1e18;
 
-    // 🔥 gọi DFS mới
     DFS_ILP(
-        0,          // i
-        0,          // cover
-        0.0,        // cost
+        0,
+        0,
+        0.0,
         mask,
         costs,
         FULL,
         current,
         best_solution,
-        best_cost
+        best_cost,
+        start
     );
 
     auto end = chrono::high_resolution_clock::now();
@@ -521,8 +491,7 @@ Solution Algorithms::ILP(const Problem& p)
         best_solution,
         best_cost,
         count,
-        chrono::duration<double>(end - start).count()
+        chrono::duration<double>(end - start).count(),
     };
 }
-
 
