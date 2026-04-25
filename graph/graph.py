@@ -40,7 +40,7 @@ class Plotter:
 
         plt.bar(self.df["Algorithm"], scaled)
 
-        plt.yscale("log")  # 🔥 KEY FIX
+        plt.yscale("log")  
 
         plt.title("Run Time Comparison (log scale)")
         plt.xlabel("Algorithm")
@@ -132,7 +132,7 @@ if __name__ == "__main__":
 
         all_data = []
 
-        for file in sorted(os.listdir(folder)):  # sort để đảm bảo order
+        for file in sorted(os.listdir(folder)):  
             if file.endswith(".csv"):
                 path = os.path.join(folder, file)
                 df = pd.read_csv(path)
@@ -140,7 +140,6 @@ if __name__ == "__main__":
                 print(f"\nFILE: {file}")
                 print(df)
 
-                # ép kiểu ngay từ đầu
                 df["N_Vul"] = df["N_Vul"].astype(int)
                 df["AvgTime"] = df["AvgTime"].astype(float)
 
@@ -151,10 +150,6 @@ if __name__ == "__main__":
             sys.exit(1)
 
         df = pd.concat(all_data, ignore_index=True)
-
-        # DEBUG tổng thể
-        print("\n=== FINAL DATA CHECK ===")
-        print(df.groupby("Algorithm")["N_Vul"].unique())
 
         plotter = Plotter(None)
         plotter.df = df
