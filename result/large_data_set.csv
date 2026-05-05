@@ -1,0 +1,6 @@
+Algorithm,N_Vul,AvgCost,AvgTime
+Brute_Force,40,78.2,6.51132
+Greedy,40,85.4,1.027e-05
+GA,40,80.6,0.169208
+SA,40,80.76,0.00260623
+ILP,40,78.2,0.0487892

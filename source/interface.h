@@ -46,13 +46,14 @@ class CLI
 
         //run single algo
         string get_file(const string& layer_name, const string& folder_name);
-        void show_patch_selected(const Problem& p, const Solution& s);
-        Algorithm_Type run_algo(const string& file_name, AlgoFunc algo, const string& algo_name);
+        Algorithm_Type run_algo(const vector<string>& files, AlgoFunc algo, const string& algo_name);
         void show_algo_menu();
         Algorithm_Type activity_algo();
         State control_run_single_algo();
 
         //run all algo
+        string get_dataset_folder(const string& layer_name, const string& root_path);
+        void show_result_folder_exist_on_directory(const vector<string>& folder);
         State control_run_all_algo();
 
         //start 

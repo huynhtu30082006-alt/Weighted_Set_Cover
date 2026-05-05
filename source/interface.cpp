@@ -32,11 +32,23 @@ void CLI::show_result_file_exist_on_folder(const vector<string>& file)
 {
     clear();
 
-    cout << "Available File:\n";
+    cout << "Available DataSet:\n";
     for(size_t i = 0; i < file.size(); i ++)
     {
         cout << i+1 << ". " << file[i] << endl;
     }
+}
+
+void CLI::show_result_folder_exist_on_directory(const vector<string>& folder)
+{
+    clear();
+
+    cout << "Available Data Set:\n";
+    for(size_t i = 0; i < folder.size(); i ++)
+    {
+        cout << i+1 << ". " << folder[i] << endl;
+    }
+
 }
 
 CLI::Plot_Graph_State CLI::plot_graph(const string& type)
@@ -183,55 +195,56 @@ CLI::State CLI::control_plot_graph()
 
 }
 
-void CLI::show_patch_selected(const Problem& p, const Solution& s)
+CLI::Algorithm_Type CLI::run_algo(const vector<string>& files, AlgoFunc algo, const string& algo_name)
 {
-
-    int count = 1;
-    cout << s.num_patches << endl;
-    for(size_t i = 0; i < s.patch_selected.size(); i++)
+    if(algo_name == "GENETIC ALGORITHM" || algo_name == "SIMULATED ANNEALING")
     {
-        if(s.patch_selected[i] == 1)
+        int n;
+        cout << "Enter the number of time to run: ";
+        cin >> n;
+        double total_cost = 0;
+        double total_runtime = 0;
+        for(const string& file : files)
         {
-            const auto& patches = p.get_patch();
-            cout << p.get_patch_name()[i] << "[";
-            for(size_t j = 0; j < patches[i].size(); j ++)
-            {
-                cout << patches[i][j];
-                if(j + 1 < patches[i].size())
-                {
-                    cout << ",";
-                }
-            }
-            cout << "]";
-            if(count < s.num_patches)
-            {
-                cout << ", ";
-            }
-            count++;
+            Problem p(file);
+            Stats s = Helper::run_benchmark(p, algo, n);
+            total_cost += s.avg_cost;
+            total_runtime += s.avg_time;
         }
+        double final_avg_cost = total_cost / files.size();
+        double final_avg_time = total_runtime / files.size();
+
+        clear();
+        cout << "=====================================\n";
+        cout << "      " << algo_name << " BENCHMARK RESULT\n";
+        cout << "=====================================\n\n";
+        cout << "Average Cost: " << final_avg_cost << "\n";
+        cout << "Average Time: " << final_avg_time << "s\n\n";
     }
-    cout << endl;
-}
+    else
+    {
+        Solution s;
+        double total_cost = 0;
+        double total_runtime = 0;
+        for(const string& file : files)
+        {
+            Problem p(file);
+            Stats s = Helper::run_benchmark(p, algo, 1);
+            total_cost += s.avg_cost;
+            total_runtime += s.avg_time;
+            
+        }
+        double final_avg_cost = total_cost / files.size();
+        double final_avg_time = total_runtime / files.size();
 
-
-CLI::Algorithm_Type CLI::run_algo(const string& file_name, AlgoFunc algo, const string& algo_name)
-{
-    Problem p(file_name);
-    Solution s = algo(p);
-    cout << "Solution func done\n";
-
-    clear();
-
-    cout << "=====================================\n";
-    cout << "      " << algo_name << " RESULT" << "      \n";
-    cout << "=====================================\n\n";
-    cout << "Patches Selected: ";
-    show_patch_selected(p, s);
-    cout << "Cost: " << s.total_cost << "\n";
-    cout << "Run Time: " << s.runtime << "s\n";
-
+        clear();
+        cout << "=====================================\n";
+        cout << "      " << algo_name << " RESULT" << "      \n";
+        cout << "=====================================\n\n";
+        cout << "Average Cost: " << final_avg_cost << "\n";
+        cout << "Average Time: " << final_avg_time << "s\n\n";
+    }
     waitting_screen();
-
 
     return Algorithm_Type::EXIT;
 }
@@ -255,6 +268,69 @@ void CLI::show_algo_menu()
     cout << "Enter (1) to (5) to start: ";
 
 }
+
+CLI::State CLI::control_run_single_algo()
+{
+    Algorithm_Type at = CLI::Algorithm_Type::ALGORITHM_MENU;
+    string folder_name = "";
+    while(at != Algorithm_Type::EXIT)
+    {
+        switch(at)
+        {
+            case(Algorithm_Type::ALGORITHM_MENU):
+            {
+                string path_folder = "data_set";
+                folder_name = get_dataset_folder("ALGORITHM", path_folder);
+                if(folder_name.empty())
+                {
+                    show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
+                    return State::MAIN_MENU;
+                }
+                at = activity_algo();
+                break;
+            }
+            case(Algorithm_Type::BRUTE_FORCE):
+            {
+                vector<string> files = Helper::get_file_in_folder(folder_name);
+                at = run_algo(files, Algorithms::Brute_Force, "BRUTE FORCE");
+                break;
+            }
+            case(Algorithm_Type::GREEDY):
+            {
+                vector<string> files = Helper::get_file_in_folder(folder_name);
+                at = run_algo(files, Algorithms::Greedy, "GREEDY");
+                break;
+            }
+            case(Algorithm_Type::GA):
+            {
+                vector<string> files = Helper::get_file_in_folder(folder_name);
+                at = run_algo(files, Algorithms::GA, "GENETIC ALGORITHM");
+                break;
+            }
+            case(Algorithm_Type::SA):
+            {
+                vector<string> files = Helper::get_file_in_folder(folder_name);
+                at = run_algo(files, Algorithms::SA, "SIMULATED ANNEALING");
+                break;
+            }
+            case (Algorithm_Type::ILP):
+            {
+                vector<string> files = Helper::get_file_in_folder(folder_name);
+                at = run_algo(files, Algorithms::ILP, "INTEGER LINEAR PROGRAMMING");
+                break;
+            }
+            case(Algorithm_Type::EXIT):
+            {
+                break;
+            }
+        }
+
+    }
+
+    return State::MAIN_MENU;
+
+}
+
 CLI::Algorithm_Type CLI::activity_algo()
 {
     while(true)
@@ -307,7 +383,7 @@ string CLI::get_file(const string& layer_name, const string& folder_name)
 {
     vector<string> file = Helper::get_file_in_folder(folder_name); 
 
-    if(!Helper::check_exist_file_on_folder(file))
+    if(!Helper::check_exist_file_or_folder(file))
     {
         while(true)
         {
@@ -330,79 +406,55 @@ string CLI::get_file(const string& layer_name, const string& folder_name)
 
 }
 
-CLI::State CLI::control_run_single_algo()
+
+
+string CLI::get_dataset_folder(const string& layer_name, const string& root_path)
 {
-    Algorithm_Type at = CLI::Algorithm_Type::ALGORITHM_MENU;
-    string file_name;
-    while(at != Algorithm_Type::EXIT)
+    vector<string> folders = Helper::get_folder_in_directory(root_path);
+
+    if(!Helper::check_exist_file_or_folder(folders))
     {
-        switch(at)
+        while(true)
         {
-            case(Algorithm_Type::ALGORITHM_MENU):
+            show_result_file_exist_on_folder(folders);
+            cout << "Choose file: ";
+
+            size_t choice;
+            cin >> choice;
+
+            if (choice < 1 || choice > folders.size()) 
             {
-                file_name = get_file("ALGORITHM", "data_set");
-                if(file_name.empty())
-                {
-                    show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
-                    return State::MAIN_MENU;
-                }
-                at = activity_algo();
-                break;
+                show_failed_interface(layer_name, "Invalid Input!!! Try Again!");
+                continue;
             }
-            case(Algorithm_Type::BRUTE_FORCE):
-            {
-                at = run_algo(file_name, Algorithms::Brute_Force, "BRUTE FORCE");
-                break;
-            }
-            case(Algorithm_Type::GREEDY):
-            {
-                at = run_algo(file_name, Algorithms::Greedy, "GREEDY");
-                break;
-            }
-            case(Algorithm_Type::GA):
-            {
-                at = run_algo(file_name, Algorithms::GA, "GENETIC ALGORITHM");
-                break;
-            }
-            case(Algorithm_Type::SA):
-            {
-                at = run_algo(file_name, Algorithms::SA, "SIMULATED ANNEALING");
-                break;
-            }
-            case (Algorithm_Type::ILP):
-            {
-                at = run_algo(file_name, Algorithms::ILP, "INTEGER LINEAR PROGRAMMING");
-                break;
-            }
-            case(Algorithm_Type::EXIT):
-            {
-                break;
-            }
+            return folders[choice - 1];
         }
 
     }
-
-    return State::MAIN_MENU;
-
+    return "";
 }
 
 CLI::State CLI::control_run_all_algo()
 {
     clear();
 
-    string file_name = get_file("ALGORITHM", "data_set");
-    if(file_name.empty())
+    string path_folder = "data_set";
+    string folder_name = get_dataset_folder("ALGORITHM", path_folder);
+    if(folder_name.empty())
     {
         show_failed_interface("ALGORITHM", "No file found! Try Again!!!");
         return State::MAIN_MENU;
     }
-    Problem p(file_name);
-
+    // path_folder = path_folder + folder_name; 
+    vector<string> files = Helper::get_file_in_folder(folder_name);
+    if(Helper::check_exist_file_or_folder(files))
+    {
+        show_failed_interface("ALGORITHM", "No instance found in dataset!");
+        return State::MAIN_MENU;
+    }
     int n;
     cout << "Enter the number of time to run: ";
     cin >> n;
-    vector<pair<string, Stats>> results;
-
     vector<pair<string, AlgoFunc>> algorithms = {
         {"Brute_Force", Algorithms::Brute_Force},
         {"Greedy", Algorithms::Greedy},
@@ -410,33 +462,42 @@ CLI::State CLI::control_run_all_algo()
         {"SA", Algorithms::SA},
         {"ILP", Algorithms::ILP}
     };
-
+    vector<vector<Stats>> all_results(algorithms.size());
+    int n_vul = 0;
     clear();
-    for(auto& [name, algo] : algorithms)
+    //LOOP qua từng instance
+    for(const string& file : files)
     {
-        Stats s;
-        if(name == "Brute_Force" || name == "Greedy" || name == "ILP")
+        Problem p(file);
+        if(n_vul == 0)
         {
-            s = Helper::run_benchmark(p, algo, 1);
-            cout << "=== " << name << " ===\n";
-            cout << "Cost: " << s.avg_cost << "\n";
-            cout << "Run Time: " << s.avg_time << "\n";
-            cout << "Patch Selected: " << s.avg_patch << "\n\n";
+            n_vul = p.get_n_vul();
         }
-        else
-        {
-            s = Helper::run_benchmark(p, algo, n);
-            cout << "=== " << name << " ===\n";
-            cout << "Average Cost: " << s.avg_cost << "\n";
-            cout << "Average Time: " << s.avg_time << "\n";
-            cout << "Average Patch Selected: " << s.avg_patch << "\n\n";
-        }
-        results.push_back({name, s});
+        cout << "\n===== Running instance: "
+            << filesystem::path(file).filename().string()
+            << " =====\n";
 
+        for (size_t j = 0; j < algorithms.size(); j++)
+        {
+            auto& [name, algo] = algorithms[j];
+            Stats s;
+
+            if (name == "Brute_Force" || name == "Greedy" || name == "ILP")
+            {
+                s = Helper::run_benchmark(p, algo, 1);
+            }
+            else
+            {
+                s = Helper::run_benchmark(p, algo, n);
+            }
+            all_results[j].push_back(s);
+        }
     }
-    Helper::write_result(results, p.get_n_vul(), file_name);
+    vector<pair<string, Stats>> final_result = Helper::compute_average(all_results, algorithms);
+    Helper::write_result(final_result, n_vul, folder_name);
     waitting_screen();
     return State::MAIN_MENU;
+
 }
 
 void CLI::show_start_interface()

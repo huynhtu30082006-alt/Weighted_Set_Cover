@@ -1,6 +1,6 @@
-Algorithm,N_Vul,AvgCost,AvgTime,AvgPatch
-Brute_Force,30,87,3.03924,8
-Greedy,30,105,1.09e-05,10
-GA,30,94.2,0.155538,8
-SA,30,93.8,0.00320854,8
-ILP,30,87,0.048807,8
+Algorithm,N_Vul,AvgCost,AvgTime
+Brute_Force,30,93.2,3.15664
+Greedy,30,101,1.905e-05
+GA,30,95.26,0.163199
+SA,30,95.68,0.00257233
+ILP,30,93.2,0.0547237

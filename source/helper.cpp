@@ -1,24 +1,50 @@
 #include "helper.h"
 #include <fstream>
 
+vector<pair<string, Stats>> Helper::compute_average(const vector<vector<Stats>>& all_results, const vector<pair<string, AlgoFunc>>& algorithms)
+{
+    vector<pair<string, Stats>> final_results;
+
+    for (size_t j = 0; j < algorithms.size(); j++)
+    {
+        const string& name = algorithms[j].first;
+        const vector<Stats>& vec = all_results[j];
+
+        double sum_cost = 0;
+        double sum_time = 0;
+
+        for (const Stats& s : vec)
+        {
+            sum_cost += s.avg_cost;
+            sum_time += s.avg_time;
+        }
+        int count = vec.size();
+
+        Stats avg;
+        avg.avg_cost = sum_cost / count;
+        avg.avg_time = sum_time / count;
+        final_results.push_back({name, avg});
+    }
+
+    return final_results;
+}
+
 Stats Helper::run_benchmark(const Problem& p, AlgoFunc algo, int runs)
 {
     double total_cost = 0;
     double total_time = 0;
-    int total_patch = 0;
 
     for(int i = 0; i < runs; i++)
     {
         Solution s = algo(p);
         total_cost += s.total_cost;
         total_time += s.runtime;
-        total_patch += s.num_patches;
         
     }
 
     return {total_cost / runs,
             total_time / runs,
-            (double) (total_patch / runs)};
+    };
 }
 
 filesystem::path Helper::change_folder_of_file(const string& new_folder_path, const string& current_path_file_name)
@@ -31,25 +57,27 @@ filesystem::path Helper::change_folder_of_file(const string& new_folder_path, co
     return new_path;
 }
 
-void Helper::write_result(vector<pair<string, Stats>>& v, int n_vul, const string& file_name)
+void Helper::write_result(vector<pair<string, Stats>>& v, int n_vul, const string& dataset_folder)
 {
-    filesystem::path f = change_folder_of_file("result/", file_name);
-    ofstream write(f);
+    string dataset_name = filesystem::path(dataset_folder).filename().string();
+
+    filesystem::path output_path = "result/" + dataset_name + ".csv";
+    ofstream write(output_path);
     if(!write)
     {
         cerr << "Cannot open output file!\n";
         return;
 
     }
-    write << "Algorithm,N_Vul,AvgCost,AvgTime,AvgPatch\n";
+    write << "Algorithm,N_Vul,AvgCost,AvgTime\n";
 
     for(auto& [name, s] : v)
     {
-        write << name << "," << n_vul << "," << s.avg_cost << "," << s.avg_time << "," << s.avg_patch << endl;
+        write << name << "," << n_vul << "," << s.avg_cost << "," << s.avg_time << endl;
     }
     write.close();
 
-    cout << "Your results have been successfully saved on: '" << f << "'"<< "\n";
+    cout << "Your results have been successfully saved on: '" << output_path << "'"<< "\n";
 }
 
 vector<string> Helper::get_file_in_folder(const string& folder_name)
@@ -67,8 +95,25 @@ vector<string> Helper::get_file_in_folder(const string& folder_name)
     return file;
 }
 
-bool Helper::check_exist_file_on_folder(const vector<string>& file)
+vector<string> Helper::get_folder_in_directory(const string& path)
 {
-    return file.empty();
+    vector<string> folders;
+
+    for (const auto& entry : filesystem::directory_iterator(path))
+    {
+        if (entry.is_directory())
+        {
+            folders.push_back(entry.path().string());
+        }
+    }
+    return folders;
 
 }
+
+bool Helper::check_exist_file_or_folder(const vector<string>& obj)
+{
+    return obj.empty();
+
+}
+
+

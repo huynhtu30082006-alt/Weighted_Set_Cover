@@ -10,7 +10,7 @@ Solution Algorithms::Brute_Force(const Problem& p)
     auto start = clk::now();
 
     int m = p.get_n_patch();
-    if (m <= 0) return {{}, 0.0, 0, 0.0};
+    if (m <= 0) return {{}, 0.0, 0};
 
     const auto& patches = p.get_patch();
     const auto& costs = p.get_cost();
@@ -54,13 +54,10 @@ Solution Algorithms::Brute_Force(const Problem& p)
 
     auto end = clk::now();
 
-    int count = accumulate(best_solution.begin(), best_solution.end(), 0);
-
     return {
         best_solution,
         best_cost,
-        count,
-        chrono::duration<double>(end-start).count(),
+        chrono::duration<double>(end-start).count()
     };
 }
 
@@ -119,10 +116,11 @@ Solution Algorithms::Greedy(const Problem& p)
 
     auto end = chrono::high_resolution_clock::now();
 
-    int count = accumulate(current.begin(), current.end(), 0);
 
-    return {current, cost, count,
-            chrono::duration<double>(end-start).count()};
+    return {current, 
+            cost,
+            chrono::duration<double>(end-start).count()
+        };
 }
 
 Solution Algorithms::GA(const Problem& p)
@@ -300,12 +298,10 @@ Solution Algorithms::GA(const Problem& p)
     }
 
     auto end = chrono::high_resolution_clock::now();
-    int count = accumulate(best_global.begin(), best_global.end(), 0);
 
     return {
         best_global,
         best_global_cost,
-        count,
         chrono::duration<double>(end - start).count()
     };
 }
@@ -409,12 +405,10 @@ Solution Algorithms::SA(const Problem& p)
     }
 
     auto end = chrono::high_resolution_clock::now();
-    int count = accumulate(best_solution.begin(), best_solution.end(), 0);
 
     return {
         best_solution,
         best_cost,
-        count,
         chrono::duration<double>(end - start).count()
     };
 }
@@ -484,14 +478,10 @@ Solution Algorithms::ILP(const Problem& p)
 
     auto end = chrono::high_resolution_clock::now();
 
-    int count = 0;
-    for(int x : best_solution) count += x;
-
     return {
         best_solution,
         best_cost,
-        count,
-        chrono::duration<double>(end - start).count(),
+        chrono::duration<double>(end - start).count()
     };
 }
 
